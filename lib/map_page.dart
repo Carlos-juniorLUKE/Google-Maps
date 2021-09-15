@@ -26,6 +26,12 @@ class _MapPageState extends State<MapPage> {
         ),
         body: GoogleMap(
           onMapCreated: _onMapCreated,
+          onCameraMove: (data) {
+            print(data);
+          },
+          onTap: (position) {
+            print(position);
+          },
           initialCameraPosition: CameraPosition(
             target: _center,
             zoom: 11.0,
