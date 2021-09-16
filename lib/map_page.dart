@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:map_teste/geolocator_api.dart';
 
 void main() => runApp(MapPage());
 
@@ -11,11 +12,18 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   GoogleMapController mapController;
   Set<Marker> markers = Set<Marker>();
-  double lat = 45.521563;
-  double long = -122.677433;
-
+  double lat = -11.396453;
+  double long = -37.411528;
+  ValueNotifier<LatLng> position;
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    position = ValueNotifier<LatLng>(LatLng(lat, long));
+    determinePosition().then((value) => position.value = LatLng(value.latitude, value.longitude));
   }
 
   @override
@@ -25,27 +33,30 @@ class _MapPageState extends State<MapPage> {
         appBar: AppBar(
           title: TextField(
             onSubmitted: (val) {
-              lat = -22.7101448;
-              long = -48.0747667;
+              lat = -11.396453;
+              long = -37.411528;
 
-              LatLng position = LatLng(lat, long);
-              mapController.moveCamera(CameraUpdate.newLatLng(position));
+              LatLng newPosition = LatLng(lat, long);
+              mapController.moveCamera(CameraUpdate.newLatLng(newPosition));
 
-              final Marker marker = Marker(
-                  markerId: new MarkerId("123456"),
-                  position: position,
-                  infoWindow: InfoWindow(
-                    title: "Casa De Ruan",
-                    snippet: "Piracicaba/SP",
-                  ));
-              setState(() {
-                markers.add(marker);
-              });
+             
+                position.value = newPosition;
             },
           ),
         ),
-        body: Container(
-          child: GoogleMap(
+        body: Container(child:
+          ValueListenableBuilder<LatLng>(
+            valueListenable:  position,
+            builder: (BuildContext context, LatLng value, Widget child) {
+               final Marker marker = Marker(
+                  markerId: new MarkerId("123456"),
+                  position: value,
+                  infoWindow: InfoWindow(
+                    title: "Casa De Ruan",
+                    snippet: "Santa Luzia/SE",
+                  ));
+                markers.add(marker);
+              return GoogleMap(
             onMapCreated: _onMapCreated,
             onCameraMove: (data) {
               print(data);
@@ -54,13 +65,14 @@ class _MapPageState extends State<MapPage> {
               print(position);
             },
             initialCameraPosition: CameraPosition(
-              target: LatLng(lat, long),
+              target: value,
               zoom: 11.0,
             ),
             markers: markers,
-          ),
+          );}
         ),
       ),
+    )
     );
   }
 }
