@@ -10,8 +10,9 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   GoogleMapController mapController;
-
-  final LatLng _center = const LatLng(45.521563, -122.677433);
+  Set<Marker> markers = Set<Marker>();
+  double lat = 45.521563;
+  double long = -122.677433;
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -22,19 +23,41 @@ class _MapPageState extends State<MapPage> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Google Maps'),
+          title: TextField(
+            onSubmitted: (val) {
+              lat = -22.7101448;
+              long = -48.0747667;
+
+              LatLng position = LatLng(lat, long);
+              mapController.moveCamera(CameraUpdate.newLatLng(position));
+
+              final Marker marker = Marker(
+                  markerId: new MarkerId("123456"),
+                  position: position,
+                  infoWindow: InfoWindow(
+                    title: "Casa De Ruan",
+                    snippet: "Piracicaba/SP",
+                  ));
+              setState(() {
+                markers.add(marker);
+              });
+            },
+          ),
         ),
-        body: GoogleMap(
-          onMapCreated: _onMapCreated,
-          onCameraMove: (data) {
-            print(data);
-          },
-          onTap: (position) {
-            print(position);
-          },
-          initialCameraPosition: CameraPosition(
-            target: _center,
-            zoom: 11.0,
+        body: Container(
+          child: GoogleMap(
+            onMapCreated: _onMapCreated,
+            onCameraMove: (data) {
+              print(data);
+            },
+            onTap: (position) {
+              print(position);
+            },
+            initialCameraPosition: CameraPosition(
+              target: LatLng(lat, long),
+              zoom: 11.0,
+            ),
+            markers: markers,
           ),
         ),
       ),
