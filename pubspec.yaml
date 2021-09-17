@@ -29,6 +29,8 @@ dependencies:
   http: ^0.13.3
   json_serializable: ^4.1.4
   geolocator: ^7.6.1
+  flutter_google_places: ^0.3.0
+  uuid: ^3.0.4
 
 dev_dependencies:
   build_runner: ^2.1.2
